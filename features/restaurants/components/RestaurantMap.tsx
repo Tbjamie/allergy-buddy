@@ -8,11 +8,10 @@ type RestaurantMarker = {
   slug: string
   name: string
   city: string
-  primary_image_url?: string | null
-  primary_image_alt?: string | null
   latitude: number
   longitude: number
   allergyExperienceCount: number
+  communityRating: number
 }
 
 type MapCenter = {
@@ -148,14 +147,14 @@ export default function RestaurantMap({
 
   useEffect(() => {
     const map = mapRef.current
-    if (!map) return
+    if (!map || !mapReady) return
 
     map.flyTo({
       center: [center.longitude, center.latitude],
       zoom: 12,
       essential: true,
     })
-  }, [center])
+  }, [center, mapReady])
 
   useEffect(() => {
     const map = mapRef.current
@@ -167,6 +166,7 @@ export default function RestaurantMap({
     restaurants.forEach((restaurant) => {
       const markerElement = document.createElement('button')
       markerElement.type = 'button'
+      markerElement.setAttribute('aria-label', restaurant.name)
       markerElement.className =
         'flex h-9 w-9 items-center justify-center rounded-full border-4 border-foreground bg-primary shadow-lg'
 
@@ -174,53 +174,73 @@ export default function RestaurantMap({
       innerDot.className = 'block h-3 w-3 rounded-full bg-white'
       markerElement.appendChild(innerDot)
 
+      const ratingColors = getMapRatingColors(restaurant.communityRating)
+
       const popup = new mapboxgl.Popup({
         offset: 24,
         closeButton: false,
         className: 'allergybuddy-map-popup',
-        }).setHTML(`
-        <div style="font-family: Satoshi, sans-serif; min-width: 180px;">
-        ${restaurant.primary_image_url
-          ? `<img
-              src="${escapeHtml(restaurant.primary_image_url)}"
-              alt="${escapeHtml(restaurant.primary_image_alt ?? restaurant.name)}"
-              style="margin-bottom:16px; height:80px; width:100%; border-radius:12px; object-fit:cover;"
-              width="400"
-              height="160"
-            />`
-          : ''}
-            <strong style="display:block; font-size:14px; color:#111827;">
-            ${escapeHtml(restaurant.name)}
-            </strong>
+      }).setHTML(`
+        <div style="font-family: Satoshi, sans-serif; min-width: 190px;">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+            <div>
+              <strong style="display:block; font-size:14px; color:#111827;">
+                ${escapeHtml(restaurant.name)}
+              </strong>
 
-            <span style="display:block; margin-top:4px; font-size:12px; color:#666A71;">
-            ${escapeHtml(restaurant.city)}
+              <span style="display:block; margin-top:4px; font-size:12px; color:#666A71;">
+                ${escapeHtml(restaurant.city)}
+              </span>
+            </div>
+
+            <span style="
+              flex-shrink:0;
+              display:inline-flex;
+              align-items:center;
+              justify-content:center;
+              min-width:34px;
+              height:26px;
+              padding:0 8px;
+              border-radius:999px;
+              background:${ratingColors.background};
+              color:${ratingColors.color};
+              font-size:12px;
+              font-weight:800;
+            ">
+              ${restaurant.communityRating.toFixed(1)}
             </span>
+          </div>
 
-            <span style="display:block; margin-top:10px; font-size:12px; color:#008080; font-weight:700;">
+          <span style="
+            display:block;
+            margin-top:10px;
+            font-size:12px;
+            color:${ratingColors.color};
+            font-weight:700;
+          ">
             ${restaurant.allergyExperienceCount} allergie-ervaringen
-            </span>
+          </span>
 
-            <a
+          <a
             href="/restaurant/${encodeURIComponent(restaurant.slug)}"
             style="
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                margin-top:12px;
-                height:36px;
-                border-radius:10px;
-                background:#008080;
-                color:white;
-                font-size:12px;
-                font-weight:700;
-                text-decoration:none;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              margin-top:12px;
+              height:36px;
+              border-radius:10px;
+              background:#008080;
+              color:white;
+              font-size:12px;
+              font-weight:700;
+              text-decoration:none;
             "
-            >
+          >
             Bekijk restaurant
-            </a>
+          </a>
         </div>
-        `)
+      `)
 
       const marker = new mapboxgl.Marker({
         element: markerElement,
@@ -250,7 +270,9 @@ async function geocodeDestination({
 
   if (!query) return null
 
-  const url = new URL(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`)
+  const url = new URL(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`
+  )
 
   url.searchParams.set('access_token', accessToken)
   url.searchParams.set('limit', '1')
@@ -273,6 +295,34 @@ async function geocodeDestination({
   return {
     latitude,
     longitude,
+  }
+}
+
+function getMapRatingColors(value: number) {
+  if (value <= 4) {
+    return {
+      color: '#D53600',
+      background: '#FBE9E3',
+    }
+  }
+
+  if (value <= 6) {
+    return {
+      color: '#EA580C',
+      background: '#FFEDD5',
+    }
+  }
+
+  if (value <= 8) {
+    return {
+      color: '#B77900',
+      background: '#FFF3CC',
+    }
+  }
+
+  return {
+    color: '#008080',
+    background: '#DDEEEE',
   }
 }
 
