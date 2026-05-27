@@ -19,13 +19,13 @@ const navItems: NavItem[] = [
   },
   {
     href: '/facts',
-    label: 'Facts',
+    label: 'Weetjes',
     match: ['/facts'],
     icon: <FactsIcon className="h-6 w-6" />,
   },
   {
     href: '/order-help',
-    label: 'Order help',
+    label: 'Bestelhulp',
     match: ['/order-help'],
     icon: <OrderHelpIcon className="h-6 w-6" />,
   },
