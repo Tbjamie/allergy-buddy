@@ -33,7 +33,6 @@ const severityOptions: {
   { value: 'mild', label: 'Mild' },
   { value: 'moderate', label: 'Gemiddeld' },
   { value: 'severe', label: 'Ernstig' },
-  { value: 'anaphylaxis_risk', label: 'Anafylaxie' },
 ]
 
 export default function AccountAllergiesEditPage({

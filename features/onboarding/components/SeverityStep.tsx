@@ -51,6 +51,10 @@ const severityOptions: {
   label: string
 }[] = [
   {
+    value: 'unknown',
+    label: 'Onbekend',
+  },
+  {
     value: 'mild',
     label: 'Mild',
   },
@@ -61,14 +65,6 @@ const severityOptions: {
   {
     value: 'severe',
     label: 'Ernstig',
-  },
-  {
-    value: 'anaphylaxis_risk',
-    label: 'Anafylaxie risico',
-  },
-  {
-    value: 'unknown',
-    label: 'Weet ik niet',
   },
 ]
 
