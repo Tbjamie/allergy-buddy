@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import { notFound, redirect } from 'next/navigation'
+import RestaurantDetailContent from '@/features/restaurants/components/RestaurantDetailContent'
 
 type RestaurantPageProps = {
   params: Promise<{
@@ -12,7 +12,25 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: restaurant } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, onboarding_completed')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!profile || !profile.onboarding_completed) {
+    redirect('/onboarding')
+  }
+
+  const { data: restaurant, error: restaurantError } = await supabase
     .from('restaurants')
     .select(`
       id,
@@ -29,83 +47,79 @@ export default async function RestaurantDetailPage({ params }: RestaurantPagePro
       phone,
       community_confidence,
       review_count,
+      community_rating,
       last_reviewed_at,
       metadata
     `)
     .eq('slug', slug)
     .maybeSingle()
 
+  if (restaurantError) {
+    console.error(restaurantError)
+  }
+
   if (!restaurant) {
     notFound()
   }
 
+  const { data: images, error: imagesError } = await supabase
+    .from('restaurant_images')
+    .select(`
+      id,
+      image_url,
+      alt_text,
+      caption,
+      is_primary,
+      sort_order
+    `)
+    .eq('restaurant_id', restaurant.id)
+    .order('is_primary', { ascending: false })
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+
+  if (imagesError) {
+    console.error(imagesError)
+  }
+
+  const { data: reviews, error: reviewsError } = await supabase
+    .from('restaurant_reviews')
+    .select(`
+      id,
+      restaurant_id,
+      profile_id,
+      title,
+      review_text,
+      warning_text,
+      recommended_dishes,
+      dishes_to_avoid,
+      allergy_context,
+      allergy_experience_rating,
+      communication_rating,
+      confidence_after_visit,
+      staff_understood_allergy,
+      staff_spoke_english,
+      staff_checked_with_kitchen,
+      cross_contamination_discussed,
+      separate_preparation_possible,
+      felt_taken_seriously,
+      would_return,
+      visited_at,
+      created_at
+    `)
+    .eq('restaurant_id', restaurant.id)
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (reviewsError) {
+    console.error(reviewsError)
+  }
+
   return (
-    <main className="min-h-dvh bg-background px-fluid-main pb-10 pt-10">
-      <div className="mx-auto max-w-md">
-        <Link href="/" className="text-sm font-bold text-primary">
-          ← Terug naar kaart
-        </Link>
-
-        <section className="mt-8">
-          <h1 className="text-[32px] font-black leading-tight text-foreground">
-            {restaurant.name}
-          </h1>
-
-          <p className="mt-3 text-sm font-medium text-dark-gray">
-            {[restaurant.city, restaurant.cuisine_type].filter(Boolean).join(' · ')}
-          </p>
-
-          {restaurant.address && (
-            <p className="mt-5 text-sm leading-6 text-foreground">
-              {restaurant.address}
-            </p>
-          )}
-        </section>
-
-        <section className="mt-6 rounded-2xl border border-foreground/15 bg-white p-4">
-          <p className="text-sm font-black text-foreground">Allergie-ervaringen</p>
-          <p className="mt-2 text-3xl font-black text-primary">
-            {restaurant.review_count ?? 0}
-          </p>
-          <p className="mt-2 text-xs leading-5 text-dark-gray">
-            Dit is gebaseerd op community-informatie. AllergyBuddy geeft geen garantie dat eten
-            veilig is.
-          </p>
-        </section>
-
-        <section className="mt-4 space-y-3">
-          {restaurant.google_maps_url && (
-            <a
-              href={restaurant.google_maps_url}
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-12 items-center justify-center rounded-xl bg-foreground text-sm font-bold text-white"
-            >
-              Open in Google Maps
-            </a>
-          )}
-
-          {restaurant.website_url && (
-            <a
-              href={restaurant.website_url}
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-12 items-center justify-center rounded-xl border border-foreground/20 text-sm font-bold text-foreground"
-            >
-              Website bekijken
-            </a>
-          )}
-
-          {restaurant.phone && (
-            <a
-              href={`tel:${restaurant.phone}`}
-              className="flex h-12 items-center justify-center rounded-xl border border-foreground/20 text-sm font-bold text-foreground"
-            >
-              Bel restaurant
-            </a>
-          )}
-        </section>
-      </div>
-    </main>
+    <RestaurantDetailContent
+      profileId={profile.id}
+      restaurant={restaurant}
+      images={images ?? []}
+      reviews={reviews ?? []}
+    />
   )
 }
