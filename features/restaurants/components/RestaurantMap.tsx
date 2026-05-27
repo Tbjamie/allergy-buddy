@@ -164,94 +164,97 @@ export default function RestaurantMap({
     markerRefs.current = []
 
     restaurants.forEach((restaurant) => {
-      const markerElement = document.createElement('button')
-      markerElement.type = 'button'
-      markerElement.setAttribute('aria-label', restaurant.name)
-      markerElement.className =
-        'flex h-9 w-9 items-center justify-center rounded-full border-4 border-foreground bg-primary shadow-lg'
+  const ratingColors = getMapRatingColors(restaurant.communityRating)
 
-      const innerDot = document.createElement('span')
-      innerDot.className = 'block h-3 w-3 rounded-full bg-white'
-      markerElement.appendChild(innerDot)
+  const markerElement = document.createElement('button')
+  markerElement.type = 'button'
+  markerElement.setAttribute('aria-label', restaurant.name)
+  markerElement.className =
+    'flex h-10 w-10 items-center justify-center rounded-full border-4 shadow-lg transition-transform duration-200 hover:scale-110'
 
-      const ratingColors = getMapRatingColors(restaurant.communityRating)
+  markerElement.style.backgroundColor = ratingColors.color
+  markerElement.style.borderColor = '#111827'
 
-      const popup = new mapboxgl.Popup({
-        offset: 24,
-        closeButton: false,
-        className: 'allergybuddy-map-popup',
-      }).setHTML(`
-        <div style="font-family: Satoshi, sans-serif; min-width: 190px;">
-          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
-            <div>
-              <strong style="display:block; font-size:14px; color:#111827;">
-                ${escapeHtml(restaurant.name)}
-              </strong>
+  const innerDot = document.createElement('span')
+  innerDot.className = 'block h-3 w-3 rounded-full bg-white'
+  markerElement.appendChild(innerDot)
 
-              <span style="display:block; margin-top:4px; font-size:12px; color:#666A71;">
-                ${escapeHtml(restaurant.city)}
-              </span>
-            </div>
+  const popup = new mapboxgl.Popup({
+    offset: 24,
+    closeButton: false,
+    className: 'allergybuddy-map-popup',
+  }).setHTML(`
+    <div style="font-family: Satoshi, sans-serif; min-width: 190px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+        <div>
+          <strong style="display:block; font-size:14px; color:#111827;">
+            ${escapeHtml(restaurant.name)}
+          </strong>
 
-            <span style="
-              flex-shrink:0;
-              display:inline-flex;
-              align-items:center;
-              justify-content:center;
-              min-width:34px;
-              height:26px;
-              padding:0 8px;
-              border-radius:999px;
-              background:${ratingColors.background};
-              color:${ratingColors.color};
-              font-size:12px;
-              font-weight:800;
-            ">
-              ${restaurant.communityRating.toFixed(1)}
-            </span>
-          </div>
-
-          <span style="
-            display:block;
-            margin-top:10px;
-            font-size:12px;
-            color:${ratingColors.color};
-            font-weight:700;
-          ">
-            ${restaurant.allergyExperienceCount} allergie-ervaringen
+          <span style="display:block; margin-top:4px; font-size:12px; color:#666A71;">
+            ${escapeHtml(restaurant.city)}
           </span>
-
-          <a
-            href="/restaurant/${encodeURIComponent(restaurant.slug)}"
-            style="
-              display:flex;
-              align-items:center;
-              justify-content:center;
-              margin-top:12px;
-              height:36px;
-              border-radius:10px;
-              background:#008080;
-              color:white;
-              font-size:12px;
-              font-weight:700;
-              text-decoration:none;
-            "
-          >
-            Bekijk restaurant
-          </a>
         </div>
-      `)
 
-      const marker = new mapboxgl.Marker({
-        element: markerElement,
-        anchor: 'bottom',
-      })
-        .setLngLat([restaurant.longitude, restaurant.latitude])
-        .setPopup(popup)
-        .addTo(map)
+        <span style="
+          flex-shrink:0;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          min-width:34px;
+          height:26px;
+          padding:0 8px;
+          border-radius:999px;
+          background:${ratingColors.background};
+          color:${ratingColors.color};
+          font-size:12px;
+          font-weight:800;
+        ">
+          ${restaurant.communityRating.toFixed(1)}
+        </span>
+      </div>
 
-      markerRefs.current.push(marker)
-    })
+      <span style="
+        display:block;
+        margin-top:10px;
+        font-size:12px;
+        color:${ratingColors.color};
+        font-weight:700;
+      ">
+        ${restaurant.allergyExperienceCount} allergie-ervaringen
+      </span>
+
+      <a
+        href="/restaurant/${encodeURIComponent(restaurant.slug)}"
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          margin-top:12px;
+          height:36px;
+          border-radius:10px;
+          background:#008080;
+          color:white;
+          font-size:12px;
+          font-weight:700;
+          text-decoration:none;
+        "
+      >
+        Bekijk restaurant
+      </a>
+    </div>
+  `)
+
+  const marker = new mapboxgl.Marker({
+    element: markerElement,
+    anchor: 'bottom',
+  })
+    .setLngLat([restaurant.longitude, restaurant.latitude])
+    .setPopup(popup)
+    .addTo(map)
+
+  markerRefs.current.push(marker)
+})
   }, [restaurants, mapReady])
 
   return <div ref={mapContainerRef} className="h-full w-full" />
