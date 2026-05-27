@@ -120,20 +120,16 @@ function FactsIcon({ className = '' }: { className?: string }) {
 
 function OrderHelpIcon({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path
-        d="M7 3v8M12 3v8M17 3v8M5 11h14M8 11v10M16 11v10"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M20 14.5c0 2.5-2 4.5-4.5 4.5H15v-9h.5c2.5 0 4.5 2 4.5 4.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <svg className={className} viewBox="0 0 59 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M26 7.5L56 7.5" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<path d="M26 25.5L56 25.5" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<path d="M26 43.5L56 43.5" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<path d="M7 48.5L18 35.5" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<line x1="3.5" y1="45" x2="6.5" y2="49" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<path d="M7 15.5L18 2.5" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+<line x1="3.5" y1="12" x2="6.5" y2="16" stroke="currentColor" strokeWidth="5" strokeLinecap="round"/>
+</svg>
+
   )
 }
 

@@ -221,7 +221,7 @@ export default function OrderHelpPage({ profile, profileAllergens }: OrderHelpPa
           </p>
         </section>
 
-        <section className="sticky top-0 z-20 -mx-fluid-main mt-6 bg-background/95 px-fluid-main py-4 backdrop-blur">
+        <section className="sticky top-0 z-20 -mx-fluid-main mt-2 bg-background/95 px-fluid-main py-4 backdrop-blur">
           <div className="rounded-2xl bg-foreground/5 px-4 py-3">
             <p className="text-xs font-black uppercase tracking-wide text-dark-gray">
               Aanbevolen taal
@@ -269,31 +269,6 @@ export default function OrderHelpPage({ profile, profileAllergens }: OrderHelpPa
                 }}
               />
             ))}
-          </div>
-
-          <div
-            className={[
-              'mt-4 rounded-2xl px-4 py-4',
-              result.status === 'danger'
-                ? 'bg-red/10'
-                : result.status === 'warning'
-                  ? 'bg-amber/15'
-                  : 'bg-primary/10',
-            ].join(' ')}
-          >
-            <p
-              className={[
-                'text-sm font-black',
-                result.status === 'danger'
-                  ? 'text-red'
-                  : result.status === 'warning'
-                    ? 'text-amber-700'
-                    : 'text-primary',
-              ].join(' ')}
-            >
-              {result.title}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-foreground">{result.description}</p>
           </div>
         </section>
 
@@ -349,6 +324,31 @@ export default function OrderHelpPage({ profile, profileAllergens }: OrderHelpPa
               </article>
             )
           })}
+
+          <div
+            className={[
+              'mt-4 rounded-2xl px-4 py-4',
+              result.status === 'danger'
+                ? 'bg-red/10'
+                : result.status === 'warning'
+                  ? 'bg-amber/15'
+                  : 'bg-primary/10',
+            ].join(' ')}
+          >
+            <p
+              className={[
+                'text-sm font-black',
+                result.status === 'danger'
+                  ? 'text-red'
+                  : result.status === 'warning'
+                    ? 'text-amber-700'
+                    : 'text-primary',
+              ].join(' ')}
+            >
+              {result.title}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-foreground">{result.description}</p>
+          </div>
         </section>
 
         <section className="mt-6 rounded-2xl bg-[#0B1635] px-5 py-5 text-white">

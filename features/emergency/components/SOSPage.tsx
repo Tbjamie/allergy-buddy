@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import BottomNavigation from '@/components/layout/BottomNavigation'
 import type { SOSProfile } from '@/app/sos/page'
@@ -15,6 +16,8 @@ type EmergencyConfig = {
   label: string
 }
 
+type LocationStatus = 'idle' | 'loading' | 'success' | 'fallback' | 'error'
+
 const emergencyConfigs: EmergencyConfig[] = [
   { countryCode: 'NL', alarmNumber: '112', label: 'Nederland' },
   { countryCode: 'BE', alarmNumber: '112', label: 'België' },
@@ -26,15 +29,97 @@ const emergencyConfigs: EmergencyConfig[] = [
   { countryCode: 'GB', alarmNumber: '999', ambulanceNumber: '999', label: 'Verenigd Koninkrijk' },
   { countryCode: 'US', alarmNumber: '911', ambulanceNumber: '911', label: 'Verenigde Staten' },
   { countryCode: 'TH', alarmNumber: '191', ambulanceNumber: '1669', label: 'Thailand' },
+  { countryCode: 'MA', alarmNumber: '19', ambulanceNumber: '15', label: 'Marokko' },
+  { countryCode: 'AE', alarmNumber: '999', ambulanceNumber: '998', label: 'Verenigde Arabische Emiraten' },
 ]
 
 export default function SOSPage({ profile }: SOSPageProps) {
-  const activeCountryCode = profile.current_country || profile.destination_country || 'NL'
-  const emergencyConfig =
-    emergencyConfigs.find((item) => item.countryCode === activeCountryCode) ??
-    emergencyConfigs.find((item) => item.countryCode === 'NL')!
+  const fallbackCountryCode = profile.current_country || profile.destination_country || 'NL'
+
+  const [detectedCountryCode, setDetectedCountryCode] = useState<string | null>(null)
+  const [locationStatus, setLocationStatus] = useState<LocationStatus>('idle')
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function detectCountryFromCurrentLocation() {
+      if (!profile.location_sharing_enabled) {
+        setLocationStatus('fallback')
+        return
+      }
+
+      if (!navigator.geolocation) {
+        setLocationStatus('fallback')
+        return
+      }
+
+      const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+      if (!accessToken) {
+        console.error('Missing NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN')
+        setLocationStatus('fallback')
+        return
+      }
+
+      setLocationStatus('loading')
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const countryCode = await reverseGeocodeCountryCode({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accessToken,
+            })
+
+            if (cancelled) return
+
+            if (countryCode) {
+              setDetectedCountryCode(countryCode)
+              setLocationStatus('success')
+              return
+            }
+
+            setLocationStatus('fallback')
+          } catch (error) {
+            console.error(error)
+
+            if (!cancelled) {
+              setLocationStatus('error')
+            }
+          }
+        },
+        () => {
+          if (!cancelled) {
+            setLocationStatus('fallback')
+          }
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 1000 * 60 * 5,
+        }
+      )
+    }
+
+    detectCountryFromCurrentLocation()
+
+    return () => {
+      cancelled = true
+    }
+  }, [profile.location_sharing_enabled])
+
+  const activeCountryCode = detectedCountryCode || fallbackCountryCode
+
+  const emergencyConfig = useMemo(() => {
+    return (
+      emergencyConfigs.find((item) => item.countryCode === activeCountryCode?.toUpperCase()) ??
+      emergencyConfigs.find((item) => item.countryCode === 'NL')!
+    )
+  }, [activeCountryCode])
 
   const callNumber = emergencyConfig.ambulanceNumber || emergencyConfig.alarmNumber
+
   const relationLabel = formatRelation(
     profile.emergency_contact_relation,
     profile.emergency_contact_relation_custom
@@ -54,6 +139,25 @@ export default function SOSPage({ profile }: SOSPageProps) {
             <p className="mt-2 text-sm leading-6 text-white/85">
               Bel daarna pas het alarmnummer en volg verdere stappen. Wacht niet af bij benauwdheid,
               zwelling van keel of tong, flauwvallen of snelle verslechtering.
+            </p>
+          </section>
+
+          <section className="mt-4 rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
+            <p className="text-xs font-black uppercase tracking-wide text-white/70">
+              Noodnummer locatie
+            </p>
+            <p className="mt-1 text-sm font-black text-white">
+              {emergencyConfig.label} · {callNumber}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-white/75">
+              {getLocationStatusText({
+                locationStatus,
+                locationSharingEnabled: profile.location_sharing_enabled,
+                fallbackLabel:
+                  emergencyConfigs.find(
+                    (item) => item.countryCode === fallbackCountryCode?.toUpperCase()
+                  )?.label ?? 'Nederland',
+              })}
             </p>
           </section>
 
@@ -266,6 +370,69 @@ export default function SOSPage({ profile }: SOSPageProps) {
       `}</style>
     </>
   )
+}
+
+async function reverseGeocodeCountryCode({
+  latitude,
+  longitude,
+  accessToken,
+}: {
+  latitude: number
+  longitude: number
+  accessToken: string
+}) {
+  const url = new URL(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json`
+  )
+
+  url.searchParams.set('access_token', accessToken)
+  url.searchParams.set('limit', '1')
+  url.searchParams.set('types', 'country')
+
+  const response = await fetch(url.toString())
+
+  if (!response.ok) {
+    return null
+  }
+
+  const data = await response.json()
+  const firstFeature = data.features?.[0]
+
+  const shortCode = firstFeature?.properties?.short_code
+
+  if (typeof shortCode !== 'string') {
+    return null
+  }
+
+  return shortCode.toUpperCase()
+}
+
+function getLocationStatusText({
+  locationStatus,
+  locationSharingEnabled,
+  fallbackLabel,
+}: {
+  locationStatus: LocationStatus
+  locationSharingEnabled: boolean | null
+  fallbackLabel: string
+}) {
+  if (!locationSharingEnabled) {
+    return `Locatie delen staat uit. We gebruiken je reislocatie als fallback: ${fallbackLabel}.`
+  }
+
+  if (locationStatus === 'loading') {
+    return 'Huidige locatie wordt opgehaald voor het juiste lokale noodnummer.'
+  }
+
+  if (locationStatus === 'success') {
+    return 'Gebaseerd op je huidige locatie.'
+  }
+
+  if (locationStatus === 'error') {
+    return `Locatie kon niet worden bepaald. We gebruiken je fallbacklocatie: ${fallbackLabel}.`
+  }
+
+  return `Huidige locatie niet beschikbaar. We gebruiken je fallbacklocatie: ${fallbackLabel}.`
 }
 
 function InfoCard({

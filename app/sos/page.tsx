@@ -18,6 +18,7 @@ export type SOSProfile = {
   emergency_contact_relation_custom: string | null
   destination_country: string | null
   current_country: string | null
+  location_sharing_enabled: boolean | null
 }
 
 export default async function SOSRoutePage() {
@@ -42,7 +43,8 @@ export default async function SOSRoutePage() {
       emergency_contact_relation,
       emergency_contact_relation_custom,
       destination_country,
-      current_country
+      current_country,
+      location_sharing_enabled
     `)
     .eq('id', user.id)
     .maybeSingle()

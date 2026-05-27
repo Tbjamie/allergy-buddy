@@ -180,7 +180,11 @@ export default function RestaurantHome({ profile, restaurants }: RestaurantHomeP
                 viewMode === 'map' ? 'bg-white/20 text-white' : 'text-white',
               ].join(' ')}
             >
-              🗺️
+              <svg className='w-5 h-5' viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6.11365 1.10593V1.99987M6.11365 4.23474V5.12869M6.11365 7.36356V8.2575M6.11365 10.4924V11.3863M6.11365 13.6212V14.0682" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M12.3713 3.3408V4.23474M12.3713 6.46961V7.36356M12.3713 9.59843V10.4924M12.3713 12.7272V13.6212M12.3713 15.8561V16.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M0.75 14.6158V3.89328C0.75 3.55468 0.941305 3.24514 1.24416 3.09372L5.74285 0.844378C5.97803 0.726779 6.25307 0.718698 6.49477 0.822279L12.3713 3.3408H17.735C18.2287 3.3408 18.6289 3.74103 18.6289 4.23474V15.8561C18.6289 16.3498 18.2287 16.75 17.735 16.75H12.3713L6.11368 14.0682L1.92664 15.4639C1.34778 15.6568 0.75 15.2259 0.75 14.6158Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
               Map
             </button>
 
@@ -192,7 +196,14 @@ export default function RestaurantHome({ profile, restaurants }: RestaurantHomeP
                 viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white',
               ].join(' ')}
             >
-              ☰
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fillRule="evenodd" clipRule="evenodd" d="M2.5 4.16667C2.5 3.70644 2.87291 3.33334 3.33292 3.33334H13.3279C13.7879 3.33334 14.1608 3.70644 14.1608 4.16667C14.1608 4.6269 13.7879 5 13.3279 5H3.33292C2.87291 5 2.5 4.6269 2.5 4.16667Z" fill="currentColor"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M2.5 10C2.5 9.53975 2.87291 9.16666 3.33292 9.16666H13.3279C13.7879 9.16666 14.1608 9.53975 14.1608 10C14.1608 10.4602 13.7879 10.8333 13.3279 10.8333H3.33292C2.87291 10.8333 2.5 10.4602 2.5 10Z" fill="currentColor"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M2.5 15.8333C2.5 15.3731 2.87291 15 3.33292 15H13.3279C13.7879 15 14.1608 15.3731 14.1608 15.8333C14.1608 16.2936 13.7879 16.6667 13.3279 16.6667H3.33292C2.87291 16.6667 2.5 16.2936 2.5 15.8333Z" fill="currentColor"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M15.8268 4.16667C15.8268 3.70644 16.1997 3.33334 16.6597 3.33334H16.6672C17.1272 3.33334 17.5001 3.70644 17.5001 4.16667C17.5001 4.6269 17.1272 5 16.6672 5H16.6597C16.1997 5 15.8268 4.6269 15.8268 4.16667Z" fill="currentColor"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M15.8268 10C15.8268 9.53975 16.1997 9.16666 16.6597 9.16666H16.6672C17.1272 9.16666 17.5001 9.53975 17.5001 10C17.5001 10.4602 17.1272 10.8333 16.6672 10.8333H16.6597C16.1997 10.8333 15.8268 10.4602 15.8268 10Z" fill="currentColor"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M15.8268 15.8333C15.8268 15.3731 16.1997 15 16.6597 15H16.6672C17.1272 15 17.5001 15.3731 17.5001 15.8333C17.5001 16.2936 17.1272 16.6667 16.6672 16.6667H16.6597C16.1997 16.6667 15.8268 16.2936 15.8268 15.8333Z" fill="currentColor"/>
+</svg>
               Lijst
             </button>
           </div>
@@ -203,7 +214,17 @@ export default function RestaurantHome({ profile, restaurants }: RestaurantHomeP
             className="pointer-events-auto relative flex h-14 w-1/2 items-center justify-center rounded-2xl bg-foreground text-white"
             aria-label="Filters openen"
           >
-            ⚙️
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M15.5 3H13.5C13.2239 3 13 3.22386 13 3.5V6.5C13 6.77614 13.2239 7 13.5 7H15.5C15.7761 7 16 6.77614 16 6.5V3.5C16 3.22386 15.7761 3 15.5 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+<path d="M10.5 10H8.5C8.22386 10 8 10.2239 8 10.5V13.5C8 13.7761 8.22386 14 8.5 14H10.5C10.7761 14 11 13.7761 11 13.5V10.5C11 10.2239 10.7761 10 10.5 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+<path d="M13.5 17H11.5C11.2239 17 11 17.2239 11 17.5V20.5C11 20.7761 11.2239 21 11.5 21H13.5C13.7761 21 14 20.7761 14 20.5V17.5C14 17.2239 13.7761 17 13.5 17Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
+<path d="M13 5H3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M11 19H3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M20.5 19H16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M20.5 12H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M20.5 5H18.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M5.5 12H3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
 
             {activeFilterCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-black text-white">
@@ -350,20 +371,18 @@ function FilterSheet({
   onClose: () => void
   onReset: () => void
 }) {
-  if (!open) return null
-
   const totalCount = restaurants.length
 
   return (
-    <div className="fixed inset-0 z-80">
+    <div className={`fixed inset-0 z-80 ${!open ? 'pointer-events-none' : ''}`}>
       <button
         type="button"
-        className="absolute inset-0 bg-foreground/35"
+        className={`absolute inset-0 bg-foreground/35 ${!open ? 'hidden' : ''}`}
         aria-label="Filters sluiten"
         onClick={onClose}
       />
 
-      <div className="absolute bottom-0 left-1/2 max-h-[88dvh] w-full max-w-md -translate-x-1/2 overflow-y-auto rounded-t-4xl bg-background px-fluid-main pb-8 pt-4 shadow-2xl">
+      <div className={`absolute bottom-0 left-1/2 max-h-[88dvh] w-full max-w-md -translate-x-1/2 overflow-y-auto rounded-t-4xl bg-background px-fluid-main pb-8 pt-4 shadow-2xl transition-transform duration-200 ${!open ? 'translate-y-full' : ''}`}>
         <div className="mx-auto mb-5 h-1.5 w-12 rounded-full bg-foreground/20" />
 
         <div className="flex items-start justify-between gap-4">
