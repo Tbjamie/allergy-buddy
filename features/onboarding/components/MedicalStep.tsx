@@ -101,8 +101,8 @@ export default function MedicalStep({ profile }: MedicalStepProps) {
             Medische informatie
           </p>
           <p className="mt-4 text-sm leading-6 text-dark-gray">
-            Voeg informatie toe die belangrijk kan zijn tijdens een allergische reactie of
-            noodsituatie.
+             Vul hier andere medische informatie in die belangrijk kan zijn voor hulpdiensten of
+             omstanders.
           </p>
         </section>
 

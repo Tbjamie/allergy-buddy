@@ -25,32 +25,62 @@ const TOTAL_STEPS = 6
 
 const countryOptions = [
   {
-    value: 'turkey',
+    code: 'TR',
     label: 'Turkije',
     flag: '🇹🇷',
   },
   {
-    value: 'netherlands',
+    code: 'NL',
     label: 'Nederland',
     flag: '🇳🇱',
   },
   {
-    value: 'thailand',
+    code: 'TH',
     label: 'Thailand',
     flag: '🇹🇭',
   },
   {
-    value: 'spain',
+    code: 'ES',
     label: 'Spanje',
     flag: '🇪🇸',
   },
   {
-    value: 'italy',
+    code: 'IT',
     label: 'Italië',
     flag: '🇮🇹',
   },
   {
-    value: 'other',
+    code: 'FR',
+    label: 'Frankrijk',
+    flag: '🇫🇷',
+  },
+  {
+    code: 'DE',
+    label: 'Duitsland',
+    flag: '🇩🇪',
+  },
+  {
+    code: 'GB',
+    label: 'Verenigd Koninkrijk',
+    flag: '🇬🇧',
+  },
+  {
+    code: 'US',
+    label: 'Verenigde Staten',
+    flag: '🇺🇸',
+  },
+  {
+    code: 'MA',
+    label: 'Marokko',
+    flag: '🇲🇦',
+  },
+  {
+    code: 'AE',
+    label: 'Verenigde Arabische Emiraten',
+    flag: '🇦🇪',
+  },
+  {
+    code: 'OTHER',
     label: 'Anders',
     flag: '🌍',
   },
@@ -60,37 +90,53 @@ export default function TravelStep({ profile }: TravelStepProps) {
   const router = useRouter()
   const supabase = createClient()
 
-  const [destinationCountry, setDestinationCountry] = useState(
-    profile.destination_country ?? 'turkey'
-  )
+  const initialCountry = normalizeCountryCode(profile.destination_country)
+
+  const [destinationCountry, setDestinationCountry] = useState(initialCountry)
   const [destinationCity, setDestinationCity] = useState(profile.destination_city ?? '')
-  const [customCountry, setCustomCountry] = useState('')
+  const [customCountry, setCustomCountry] = useState(
+    initialCountry === 'OTHER' && profile.destination_country ? profile.destination_country : ''
+  )
   const [locationSharingEnabled, setLocationSharingEnabled] = useState(
     profile.location_sharing_enabled ?? false
   )
 
   const [loading, setLoading] = useState(false)
+  const [locationLoading, setLocationLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const selectedCountry = countryOptions.find((country) => country.value === destinationCountry)
+  const selectedCountry = countryOptions.find((country) => country.code === destinationCountry)
 
   const canContinue =
-    destinationCountry !== 'other' || (destinationCountry === 'other' && customCountry.trim())
+    destinationCountry !== 'OTHER' ||
+    (destinationCountry === 'OTHER' && customCountry.trim().length > 0)
 
   async function handleRequestLocation() {
+    setErrorMessage(null)
+
     if (!navigator.geolocation) {
+      setLocationSharingEnabled(false)
       setErrorMessage('Locatie delen wordt niet ondersteund door deze browser.')
       return
     }
 
+    setLocationLoading(true)
+
     navigator.geolocation.getCurrentPosition(
       () => {
+        setLocationLoading(false)
         setLocationSharingEnabled(true)
         setErrorMessage(null)
       },
       () => {
+        setLocationLoading(false)
         setLocationSharingEnabled(false)
         setErrorMessage('Locatie delen is geweigerd of kon niet worden opgehaald.')
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 1000 * 60 * 5,
       }
     )
   }
@@ -102,7 +148,7 @@ export default function TravelStep({ profile }: TravelStepProps) {
     setErrorMessage(null)
 
     const finalDestinationCountry =
-      destinationCountry === 'other' ? customCountry.trim() : selectedCountry?.label ?? null
+      destinationCountry === 'OTHER' ? customCountry.trim() : destinationCountry
 
     const { error } = await supabase
       .from('profiles')
@@ -149,9 +195,7 @@ export default function TravelStep({ profile }: TravelStepProps) {
 
         <section>
           <h1 className="text-[30px] font-black text-primary">Welkom</h1>
-          <p className="mt-3 text-[30px] leading-tight text-foreground">
-            Selecteer je reis
-          </p>
+          <p className="mt-3 text-[30px] leading-tight text-foreground">Selecteer je reis</p>
           <p className="mt-4 text-sm leading-6 text-dark-gray">
             Kies je bestemming, zodat AllergyBuddy communicatie, restaurants en noodinformatie
             beter kan afstemmen op je reis.
@@ -164,13 +208,13 @@ export default function TravelStep({ profile }: TravelStepProps) {
 
             <div className="space-y-3">
               {countryOptions.map((country) => {
-                const isSelected = destinationCountry === country.value
+                const isSelected = destinationCountry === country.code
 
                 return (
                   <button
-                    key={country.value}
+                    key={country.code}
                     type="button"
-                    onClick={() => setDestinationCountry(country.value)}
+                    onClick={() => setDestinationCountry(country.code)}
                     className={[
                       'flex min-h-14.5 w-full items-center justify-between rounded-xl border px-4 text-left transition-all duration-200',
                       isSelected
@@ -195,9 +239,15 @@ export default function TravelStep({ profile }: TravelStepProps) {
                 )
               })}
             </div>
+
+            {selectedCountry && selectedCountry.code !== 'OTHER' && (
+              <p className="mt-3 text-xs font-bold text-dark-gray">
+                Geselecteerd: {selectedCountry.flag} {selectedCountry.label} ({selectedCountry.code})
+              </p>
+            )}
           </div>
 
-          {destinationCountry === 'other' && (
+          {destinationCountry === 'OTHER' && (
             <div>
               <label
                 htmlFor="customCountry"
@@ -210,9 +260,13 @@ export default function TravelStep({ profile }: TravelStepProps) {
                 type="text"
                 value={customCountry}
                 onChange={(event) => setCustomCountry(event.target.value)}
-                placeholder="Bijvoorbeeld: Frankrijk"
+                placeholder="Bijvoorbeeld: Portugal"
                 className="h-14.5 w-full rounded-xl border border-foreground/20 bg-white px-4 text-sm font-medium text-foreground outline-none placeholder:text-dark-gray/60 focus:border-primary"
               />
+              <p className="mt-2 text-xs leading-5 text-dark-gray">
+                Let op: voor landen buiten de vaste lijst kan AllergyBuddy terugvallen op Engels en
+                algemene noodinformatie.
+              </p>
             </div>
           )}
 
@@ -244,7 +298,9 @@ export default function TravelStep({ profile }: TravelStepProps) {
             ].join(' ')}
           >
             <span>
-              <span className="block text-sm font-black">Locatie delen</span>
+              <span className="block text-sm font-black">
+                {locationLoading ? 'Locatie ophalen...' : 'Locatie delen'}
+              </span>
               <span
                 className={[
                   'mt-1 block text-xs leading-5',
@@ -264,6 +320,16 @@ export default function TravelStep({ profile }: TravelStepProps) {
               {locationSharingEnabled && <span className="h-3 w-3 rounded-full bg-primary" />}
             </span>
           </button>
+
+          {locationSharingEnabled && (
+            <button
+              type="button"
+              onClick={() => setLocationSharingEnabled(false)}
+              className="text-sm font-black text-red"
+            >
+              Locatie delen uitzetten
+            </button>
+          )}
 
           <div className="rounded-xl bg-amber/15 px-4 py-3 text-xs font-medium leading-5 text-foreground">
             AllergyBuddy gebruikt je bestemming alleen om informatie relevanter te maken. De app
@@ -294,6 +360,76 @@ export default function TravelStep({ profile }: TravelStepProps) {
       </div>
     </main>
   )
+}
+
+function normalizeCountryCode(value: string | null) {
+  if (!value) return 'TR'
+
+  const normalizedValue = value.trim().toUpperCase()
+
+  const aliases: Record<string, string> = {
+    TURKIJE: 'TR',
+    TURKEY: 'TR',
+    TÜRKIYE: 'TR',
+    TR: 'TR',
+
+    NEDERLAND: 'NL',
+    NETHERLANDS: 'NL',
+    HOLLAND: 'NL',
+    NL: 'NL',
+
+    THAILAND: 'TH',
+    TH: 'TH',
+
+    SPANJE: 'ES',
+    SPAIN: 'ES',
+    ESPAÑA: 'ES',
+    ES: 'ES',
+
+    ITALIË: 'IT',
+    ITALIE: 'IT',
+    ITALY: 'IT',
+    IT: 'IT',
+
+    FRANKRIJK: 'FR',
+    FRANCE: 'FR',
+    FR: 'FR',
+
+    DUITSLAND: 'DE',
+    GERMANY: 'DE',
+    DEUTSCHLAND: 'DE',
+    DE: 'DE',
+
+    VERENIGD_KONINKRIJK: 'GB',
+    'VERENIGD KONINKRIJK': 'GB',
+    UNITED_KINGDOM: 'GB',
+    'UNITED KINGDOM': 'GB',
+    UK: 'GB',
+    GB: 'GB',
+
+    VERENIGDE_STATEN: 'US',
+    'VERENIGDE STATEN': 'US',
+    UNITED_STATES: 'US',
+    'UNITED STATES': 'US',
+    USA: 'US',
+    US: 'US',
+
+    MAROKKO: 'MA',
+    MOROCCO: 'MA',
+    MA: 'MA',
+
+    'VERENIGDE ARABISCHE EMIRATEN': 'AE',
+    UNITED_ARAB_EMIRATES: 'AE',
+    'UNITED ARAB EMIRATES': 'AE',
+    UAE: 'AE',
+    AE: 'AE',
+  }
+
+  const countryCode = aliases[normalizedValue] ?? normalizedValue
+
+  const existsInOptions = countryOptions.some((country) => country.code === countryCode)
+
+  return existsInOptions ? countryCode : 'OTHER'
 }
 
 function OnboardingProgress({

@@ -102,13 +102,32 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
   const [relationCustom, setRelationCustom] = useState(
     profile.emergency_contact_relation_custom ?? ''
   )
-  const [language, setLanguage] = useState(profile.emergency_contact_language ?? 'nl')
+  const [languages, setLanguages] = useState<string[]>(() => {
+  if (!profile.emergency_contact_language) return ['nl']
+
+  return profile.emergency_contact_language
+    .split(',')
+    .map((language) => language.trim())
+    .filter(Boolean)
+})
   const [note, setNote] = useState(profile.emergency_contact_note ?? '')
 
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const canContinue = name.trim().length > 0 && phone.trim().length > 0 && relation
+
+  function toggleLanguage(languageValue: string) {
+  setLanguages((current) => {
+    if (current.includes(languageValue)) {
+      const nextLanguages = current.filter((item) => item !== languageValue)
+
+      return nextLanguages.length > 0 ? nextLanguages : current
+    }
+
+    return [...current, languageValue]
+  })
+}
 
   async function handleNext() {
     if (!canContinue) return
@@ -120,6 +139,7 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
     const normalizedPhone = phone.trim()
     const normalizedRelationCustom = relationCustom.trim() || null
     const normalizedNote = note.trim() || null
+    const normalizedLanguages = languages.join(',')
 
     const { error: profileError } = await supabase
       .from('profiles')
@@ -128,7 +148,7 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
         emergency_contact_phone: normalizedPhone,
         emergency_contact_relation: relation,
         emergency_contact_relation_custom: relation === 'other' ? normalizedRelationCustom : null,
-        emergency_contact_language: language,
+        emergency_contact_language: normalizedLanguages,
         emergency_contact_note: normalizedNote,
         onboarding_step: 5,
       })
@@ -155,7 +175,7 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
           phone: normalizedPhone,
           relation,
           relation_custom: relation === 'other' ? normalizedRelationCustom : null,
-          language,
+          language: normalizedLanguages,
           note: normalizedNote,
           can_be_called: true,
           priority: 1,
@@ -175,7 +195,7 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
         phone: normalizedPhone,
         relation,
         relation_custom: relation === 'other' ? normalizedRelationCustom : null,
-        language,
+        language: normalizedLanguages,
         note: normalizedNote,
         can_be_called: true,
         priority: 1,
@@ -303,13 +323,13 @@ export default function EmergencyContactStep({ profile }: EmergencyContactStepPr
 
             <div className="grid grid-cols-2 gap-3">
               {languageOptions.map((option) => {
-                const isSelected = language === option.value
+                const isSelected = languages.includes(option.value)
 
                 return (
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setLanguage(option.value)}
+                    onClick={() => toggleLanguage(option.value)}
                     className={[
                       'min-h-11 rounded-xl border px-3 text-sm font-bold transition-all duration-200',
                       isSelected

@@ -14,7 +14,9 @@ export default function RegisterForm() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -81,6 +83,7 @@ export default function RegisterForm() {
               <input
                 id="fullName"
                 type="text"
+                autoComplete="name"
                 required
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
@@ -95,6 +98,7 @@ export default function RegisterForm() {
               </label>
               <input
                 id="registerEmail"
+                autoComplete="email"
                 type="email"
                 required
                 value={email}
@@ -105,40 +109,64 @@ export default function RegisterForm() {
             </div>
 
             <div>
-              <label
-                htmlFor="registerPassword"
-                className="mb-2 block text-sm font-bold text-[#111827]"
-              >
-                Wachtwoord
-              </label>
-              <input
-                id="registerPassword"
-                type="password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="••••••••••••"
-                className="h-14.5 w-full rounded-xl border border-gray-300 px-4 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#008080]"
-              />
-            </div>
+  <label
+    htmlFor="registerPassword"
+    className="mb-2 block text-sm font-bold text-[#111827]"
+  >
+    Wachtwoord
+  </label>
 
-            <div>
-              <label
-                htmlFor="passwordConfirm"
-                className="mb-2 block text-sm font-bold text-[#111827]"
-              >
-                Bevestig Wachtwoord
-              </label>
-              <input
-                id="passwordConfirm"
-                type="password"
-                required
-                value={passwordConfirm}
-                onChange={(event) => setPasswordConfirm(event.target.value)}
-                placeholder="••••••••••••"
-                className="h-14.5 w-full rounded-xl border border-gray-300 px-4 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#008080]"
-              />
-            </div>
+  <div className="relative">
+    <input
+      id="registerPassword"
+      type={showPassword ? 'text' : 'password'}
+      required
+      value={password}
+      onChange={(event) => setPassword(event.target.value)}
+      autoComplete="new-password"
+      placeholder="••••••••••••"
+      className="h-14.5 w-full rounded-xl border border-gray-300 px-4 pr-12 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#008080]"
+    />
+
+    <PasswordToggleButton
+      showPassword={showPassword}
+      onClick={() => setShowPassword((value) => !value)}
+      label={showPassword ? 'Wachtwoord verbergen' : 'Wachtwoord tonen'}
+    />
+  </div>
+</div>
+
+<div>
+  <label
+    htmlFor="passwordConfirm"
+    className="mb-2 block text-sm font-bold text-[#111827]"
+  >
+    Bevestig Wachtwoord
+  </label>
+
+  <div className="relative">
+    <input
+      id="passwordConfirm"
+      type={showPasswordConfirm ? 'text' : 'password'}
+      required
+      value={passwordConfirm}
+      autoComplete="new-password"
+      onChange={(event) => setPasswordConfirm(event.target.value)}
+      placeholder="••••••••••••"
+      className="h-14.5 w-full rounded-xl border border-gray-300 px-4 pr-12 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#008080]"
+    />
+
+    <PasswordToggleButton
+      showPassword={showPasswordConfirm}
+      onClick={() => setShowPasswordConfirm((value) => !value)}
+      label={
+        showPasswordConfirm
+          ? 'Bevestiging wachtwoord verbergen'
+          : 'Bevestiging wachtwoord tonen'
+      }
+    />
+  </div>
+</div>
 
             {errorMessage && (
               <div className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -166,4 +194,68 @@ export default function RegisterForm() {
       </div>
     </main>
   )
+
+  function PasswordToggleButton({
+  showPassword,
+  onClick,
+  label,
+}: {
+  showPassword: boolean
+  onClick: () => void
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center justify-center text-[#666A71] transition-colors hover:text-[#111827]"
+      aria-label={label}
+    >
+      {showPassword ? (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M3 3L21 21"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-.58"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M9.88 4.24A9.77 9.77 0 0 1 12 4c5 0 8.5 4 10 8a13.2 13.2 0 0 1-2.1 3.6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M6.61 6.61C4.37 8.04 2.82 10.17 2 12c1.5 4 5 8 10 8a9.9 9.9 0 0 0 4.37-1.01"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : (
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M2 12C3.5 8 7 4 12 4s8.5 4 10 8c-1.5 4-5 8-10 8s-8.5-4-10-8Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+        </svg>
+      )}
+    </button>
+  )
+}
 }

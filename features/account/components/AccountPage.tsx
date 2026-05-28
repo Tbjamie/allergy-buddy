@@ -203,7 +203,7 @@ export default function AccountPage({
                 <p className="mt-1 text-sm font-medium text-dark-gray">
                   {formatRelation(profile.emergency_contact_relation, profile.emergency_contact_relation_custom)}
                   {profile.emergency_contact_language
-                    ? ` · ${profile.emergency_contact_language.toUpperCase()}`
+                    ? ` · ${formatLanguages(profile.emergency_contact_language)}`
                     : ''}
                 </p>
 
@@ -277,6 +277,23 @@ export default function AccountPage({
       <BottomNavigation />
     </main>
   )
+}
+
+function formatLanguages(value: string | null) {
+  if (!value) return ''
+
+  const labels: Record<string, string> = {
+    nl: 'Nederlands',
+    en: 'Engels',
+    tr: 'Turks',
+    ar: 'Arabisch',
+    other: 'Anders',
+  }
+
+  return value
+    .split(',')
+    .map((language) => labels[language.trim()] ?? language.trim())
+    .join(', ')
 }
 
 function SectionHeader({
