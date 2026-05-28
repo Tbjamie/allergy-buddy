@@ -125,14 +125,6 @@ export default function RestaurantDetailContent({
             />
 
             <div className="absolute inset-0 bg-linear-to-t from-foreground/45 via-transparent to-foreground/10" />
-
-            {activeImage.caption && (
-              <div className="absolute bottom-4 left-4 right-4">
-                <p className="line-clamp-1 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-foreground backdrop-blur">
-                  {activeImage.caption}
-                </p>
-              </div>
-            )}
           </div>
         ) : (
           <div className="flex h-64 w-full items-center justify-center rounded-b-4xl bg-foreground">
