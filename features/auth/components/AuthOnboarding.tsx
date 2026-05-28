@@ -20,7 +20,7 @@ export default function AuthOnboarding() {
             <Image
               src="/images/home-hero-nut-milk.png"
               alt="Home Nut & Milk"
-              className="h-auto w-55"
+              className="h-auto w-55 max-w-md mx-auto"
               width={220}
               height={207}
               priority

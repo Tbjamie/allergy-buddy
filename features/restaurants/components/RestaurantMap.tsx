@@ -170,7 +170,7 @@ export default function RestaurantMap({
   markerElement.type = 'button'
   markerElement.setAttribute('aria-label', restaurant.name)
   markerElement.className =
-    'flex h-10 w-10 items-center justify-center rounded-full border-4 shadow-lg transition-transform duration-200 hover:scale-110'
+    'flex h-10 w-10 items-center justify-center rounded-full border-4 shadow-lg transition-transform duration-200'
 
   markerElement.style.backgroundColor = ratingColors.color
   markerElement.style.borderColor = '#111827'

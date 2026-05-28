@@ -1,11 +1,40 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import RestaurantDetailContent from '@/features/restaurants/components/RestaurantDetailContent'
+import type { Metadata } from 'next'
 
 type RestaurantPageProps = {
   params: Promise<{
     slug: string
   }>
+}
+
+export async function generateMetadata({ params }: RestaurantPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const supabase = await createClient()
+
+  const { data: restaurant } = await supabase
+    .from('restaurants')
+    .select('name, city, cuisine_type')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (!restaurant) {
+    return {
+      title: 'Restaurant | AllergyBuddy',
+      description: 'Bekijk restaurantinformatie en allergie-ervaringen in AllergyBuddy.',
+    }
+  }
+
+  const descriptionParts = [restaurant.city, restaurant.cuisine_type].filter(Boolean)
+
+  return {
+    title: `${restaurant.name} | AllergyBuddy`,
+    description:
+      descriptionParts.length > 0
+        ? `Bekijk allergie-ervaringen voor ${restaurant.name} in ${descriptionParts.join(' · ')}.`
+        : `Bekijk allergie-ervaringen voor ${restaurant.name}.`,
+  }
 }
 
 export default async function RestaurantDetailPage({ params }: RestaurantPageProps) {

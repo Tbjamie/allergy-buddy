@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import RoleStep from '@/features/onboarding/components/RoleStep'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Selecteer rol | AllergyBuddy',
+  description: 'Kies je rol als gebruiker of restaurant in de AllergyBuddy app om gepersonaliseerde allergie-ervaringen te ontdekken.',
+}
 
 export default async function OnboardingRolePage() {
   const supabase = await createClient()

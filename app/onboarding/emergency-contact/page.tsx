@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import EmergencyContactStep from '@/features/onboarding/components/EmergencyContactStep'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Selecteer noodgevallcontact | AllergyBuddy',
+  description: 'Kies je noodgevallcontact in de AllergyBuddy app om gepersonaliseerde allergie-ervaringen te ontdekken.',
+}
 
 export default async function OnboardingEmergencyContactPage() {
   const supabase = await createClient()

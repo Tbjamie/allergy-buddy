@@ -114,7 +114,7 @@ export default function RestaurantDetailContent({
     <main className="min-h-dvh bg-background pb-10">
       <section>
         {activeImage ? (
-          <div className="relative h-72 w-full overflow-hidden rounded-b-4xl bg-foreground">
+          <div className="relative h-72 w-full overflow-hidden rounded-b-4xl bg-foreground max-w-md mx-auto">
             <Image
               src={activeImage.image_url}
               alt={activeImage.alt_text ?? restaurant.name}

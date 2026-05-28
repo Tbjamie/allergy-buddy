@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import TravelStep from '@/features/onboarding/components/TravelStep'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Selecteer reisbestemming | AllergyBuddy',
+  description: 'Kies je reisbestemming in de AllergyBuddy app om gepersonaliseerde allergie-ervaringen te ontdekken.',
+}
 
 export default async function OnboardingTravelPage() {
   const supabase = await createClient()

@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import MedicalStep from '@/features/onboarding/components/MedicalStep'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Selecteer medische informatie | AllergyBuddy',
+  description: 'Deel je medische informatie in de AllergyBuddy app om gepersonaliseerde allergie-ervaringen te ontdekken.',
+}
 
 export default async function OnboardingMedicalPage() {
   const supabase = await createClient()
