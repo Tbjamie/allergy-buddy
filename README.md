@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AllergyBuddy
 
-## Getting Started
+AllergyBuddy is a concept web application designed to help Dutch travelers with food allergies make safer choices when eating out abroad. The project focuses on reducing stress, miscommunication, and uncertainty in restaurant situations by combining restaurant discovery, allergy communication support, and emergency guidance in one digital experience.
 
-First, run the development server:
+The current pilot context for the project is **Turkey**, where language barriers, unfamiliar ingredients, and unclear allergen communication can make eating out more stressful for travelers with severe food allergies.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Project goal
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+AllergyBuddy was developed as part of a CMD graduation project and aims to answer the following design challenge:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> How can digital support help Dutch travelers with a food allergy make safer choices in restaurants in Turkey, without creating false certainty, while also considering feasibility for restaurants?
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Core features
 
-## Learn More
+- **Restaurant discovery**
+  Find restaurants and view relevant allergy-related information in one place.
 
-To learn more about Next.js, take a look at the following resources:
+- **Personal allergy profile**
+  Create a profile with allergies, severity, emergency details, and relevant medical context.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Communication support**
+  Show translated allergy information and useful phrases to help communicate clearly with restaurant staff.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Emergency flow**
+  Access emergency steps and key actions quickly in case of a severe allergic reaction.
 
-## Deploy on Vercel
+- **Allergy facts**
+  View allergy facts and see what can lessen or worsen allergic reactions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Why this project exists
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For many people, eating out while traveling is relaxing and spontaneous. For travelers with a severe food allergy, it is often the opposite. A simple restaurant visit can become a stressful experience because of:
+
+- language barriers
+- unclear menus
+- hidden ingredients
+- uncertainty about cross-contamination
+- lack of trustworthy allergen information
+- not knowing what to do quickly if something goes wrong
+
+AllergyBuddy aims to reduce that uncertainty by supporting the user across three key moments:
+
+1. **Choosing a restaurant**
+2. **Communicating the allergy while ordering**
+3. **Acting quickly in an emergency**
+
+## Tech stack
+
+This project is built with:
+
+- **Next.js**
+- **TypeScript**
+- **Tailwind CSS**
+- **Supabase** for authentication and database
+- **Mapbox GL** for map-based restaurant discovery
+
+## Main user flow
+
+A typical user flow looks like this:
+
+1. The user signs in
+2. The user adds allergy and severity information
+3. The user completes onboarding
+4. The user browses restaurants on the map
+5. The user opens a restaurant detail page
+6. The user uses communication support while ordering
+7. If needed, the user can open the emergency flow
